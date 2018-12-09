@@ -1,6 +1,12 @@
 #ifndef TREE_H_
 #define TREE_H_
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <malloc.h>
+#include <ctype.h>
+
 typedef struct node
 {
 	char * str;
@@ -14,6 +20,12 @@ typedef struct tree
 	Node * root;
 	int amount;
 }Tree;
+
+enum NAMES
+{
+	INCORRECT_ARGUMENT 	= -1,
+	ONE					= 1
+};
 
 //Creates tree
 Tree * CreateTree();
@@ -32,13 +44,14 @@ int PrintGraph(Tree *);
 
 //Function that writes a structure of a tree
 int WriteGraph(Tree *);
-
 //Recursive function for bypassing of a tree for WriteGraph
 int CycleWrite(FILE *, Node *);
 
 long long FSize(FILE * ptrfile);
 
-//Node * ReadGraph(FILE *, char *, char*);
+// Reads graph from file
 Node * ReadGraph(FILE *);
+Node * RecRead(char *, char *, int *);
+int SkipSpace(int *, char *);
 
 #endif

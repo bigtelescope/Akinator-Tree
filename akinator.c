@@ -1,9 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <malloc.h>
-#include <ctype.h>
-
 //--------------------------------------------------
 //
 //починить ввод в dot нескольких слов
@@ -33,28 +27,25 @@ int main()
 	Tree * one = CreateTree();
 
 	FILE * fileptr = fopen("tree.txt", "r");
-	//long long size = FSize(fileptr);
-
 	one->root = ReadGraph(fileptr);
 	if(one->root == NULL)
 		printf("HERE'S NULL\n");
 
+	//Search(one->root);
+
 	fclose(fileptr);
+	//PrintGraph(one);
 	//WriteGraph(one);
 
 	if(one->root->str == NULL)
 		printf("One root NULL\n");
 
-	printf("root = %s\nroot.left = %s\n", one->root->str, one->root->left->str);
-
-	//PrintGraph(one);	
-
-	//printf("end = %d\n", one->amount);
+	printf("root = %s\nroot.left = %s\n", one->root->str, one->root->left->left->str);
 }
 
 Tree * CreateTree()
 {
-	Tree * point = (Tree *)calloc(1, sizeof(Tree));
+	Tree * point = (Tree *)calloc(ONE, sizeof(*point));
 	if(!point)
 		return NULL;
 
@@ -65,26 +56,26 @@ Tree * CreateTree()
 
 void TreeDestroy(Tree * point)
 {
-	free(point->root);
 	point->amount = 0;
+	free(point->root);
+	free(point);
 }
 
 Node * CreateNode(char * value)
 {
-	if(!value || value == "\0")
+	if(value == NULL || value == "\0")
 	{
 		printf("CreateNode fucked up\n");
 		return NULL;
 	}
 
-	Node * ptr = (Node *)calloc(1, sizeof(Node));
+	Node * ptr = (Node *)calloc(ONE, sizeof(*ptr));
 	if(!ptr)
 		return NULL;
 
 	ptr->str = value;
 	ptr->left = NULL;
 	ptr->right = NULL;
-	//ptr->prev = prev;
 
 	return ptr;
 }
@@ -97,7 +88,6 @@ int CyclePrint(FILE * fileptr, Node * node)
 	if(node->left)
 	{
 		fprintf(fileptr, "%s", node->str);
-		//fwrite(node->str, sizeof(char), sizeof(node->str), fileptr);
 		fprintf(fileptr, " -- ");
 		CyclePrint(fileptr, node->left);
 	}
@@ -165,47 +155,89 @@ int CycleWrite(FILE * fileptr, Node * node)
 	return 0;
 }
 
-int SkipSpace(int * i, char * text)
+int SkipSpace(char ** text)
 {
-	if(isspace(*(text + *i)))
-		while(isspace(*(text + *i)))
-			*i += 1;
+	while(isspace(**text))
+		*text += 1;
 	return 0;
 }
 
-Node * RecRead(char * text, char * word, int * i)
+Node * RecRead(char ** text, char * word, char * buff)
 {
-	sscanf(text + *i, "%s", word);
-	*i += strlen(word) + 1;
+	for(int j = 0; j < 30; j++)
+	{
+		word[j] = 0;
+		buff[j] = 0;
+	}
+	int i = 0;
+	//printf("RECREAD\n");
+	if(sscanf(*text, "%s", word) < 0)
+	{
+		printf("Bad scanf\n");
+		return NULL;
+	}
+	//printf("WORD = %s\n", word);
+	*text += strlen(word) + 1;
 	if(strcmp(word ,"{"))
 		return NULL;
 
-	sscanf(text + *i, "%s", word);
-	*i += strlen(word) + 1;
-
+	while(strcmp(buff, "{}") != 0 && strcmp(buff, "{") != 0)
+	{
+		//int i = 0;
+		if(sscanf(*text, "%s ", word + i) < 0)
+		{
+			printf("Bad scanf\n");
+			return NULL;
+		}
+		//i += strlen(word + i);
+		printf("i = %d\n", i);
+		*text += strlen(word + i) + 1;
+		i += strlen(word + i);
+		sscanf(*text, "%s", buff);
+		//printf("wordi = %s wordi + 1 = %s\n", word + i - 1, word + i + 1);
+		word[i] = ' ';
+		i++;
+		//printf("text = %s word = %s, buff = %s\n",*text, strdup(word), buff);
+	}
+	
 	Node * node = CreateNode(strdup(word));	
+	printf("new node = %s\n", node->str);
 
-	SkipSpace(i, text);
+	SkipSpace(text);
 
-	node->left = RecRead(text, word, i);
-	SkipSpace(i, text);
-	node->right = RecRead(text, word, i);
-	SkipSpace(i, text);
+	node->left = RecRead(text, word, buff);
+	SkipSpace(text);
+	printf("left\n");
+	node->right = RecRead(text, word, buff);
+	SkipSpace(text);
+	printf("right\n");
 
-	sscanf(text + *i, "%s", word);
-	*i += strlen(word) + 1;
+	if(sscanf(*text, "%s", word) < 0)
+	{
+		printf("Bad scanf\n");
+		return NULL;
+	}
+	*text += strlen(word) + 1;
 	if(strcmp(word ,"}"))
 		return NULL;
 
+	//printf("end\n");
 	return node;
 }
 
 Node * ReadGraph(FILE * fileptr)
 {
+	if(!fileptr)
+		return NULL;
+
 	long long size = FSize(fileptr);
+	if(!fileptr)
+		return NULL;
+
 	printf("size = %lld\n", size);
-	char text[size];
-	char word[size];
+	char * text = (char *)calloc(size, sizeof(char));
+	char * word = (char *)calloc(size, sizeof(char));
+	char * buff = (char *)calloc(size, sizeof(char));
 	int counter = 0;
 
 	if((fread(text, sizeof(char), size, fileptr)) != size)
@@ -214,7 +246,15 @@ Node * ReadGraph(FILE * fileptr)
 		return NULL;
 	}
 
-	return RecRead(text, word, &counter);
+	char * _tmp = text;
+	Node * root = RecRead(&_tmp, word, buff);
+
+	free(text);
+	free(word);
+	free(buff);
+
+	return root;  
+
 }
 
 long long FSize(FILE * ptrfile)
@@ -229,5 +269,21 @@ long long FSize(FILE * ptrfile)
 	long long size = ftell(ptrfile);
 	fseek(ptrfile, curroff, SEEK_SET);
 	return size;
+}
+
+void Search(Node * node)
+{
+	printf("Is this %s?\nEnter your answer ( y / n )\n", node->str);
+	char ans = getchar();
+	if(ans == 'y')
+		node = node->left;
+	else if(node->right)
+		node = node->right;
+	else 
+	{
+		char name[512];
+		printf("Who is it?\n");
+
+	}
 }
 
