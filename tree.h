@@ -7,6 +7,14 @@
 #include <malloc.h>
 #include <ctype.h>
 
+/*
+#define TAB() do 							\
+		{									\
+			for(int j = 0; j < i; j++)			\
+				fprintf(fileptr, "\t");		\
+		} while (1)	
+*/			
+
 typedef struct node
 {
 	char * str;
@@ -45,13 +53,17 @@ int PrintGraph(Tree *);
 //Function that writes a structure of a tree
 int WriteGraph(Tree *);
 //Recursive function for bypassing of a tree for WriteGraph
-int CycleWrite(FILE *, Node *);
+int CycleWrite(FILE *, Node *, int );
 
 long long FSize(FILE * ptrfile);
 
 // Reads graph from file
 Node * ReadGraph(FILE *);
-Node * RecRead(char *, char *, int *);
-int SkipSpace(int *, char *);
+Node * RecRead(char **, char *, char *);
+int SkipSpace(char **);
+
+void Search(Node *);
+void NodeChange(Node *);
+void CreatePers(Node *);
 
 #endif

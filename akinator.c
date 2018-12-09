@@ -8,39 +8,16 @@
 
 int main()
 {
-	/*Tree * tree = CreateTree();
-
-	tree->root = CreateNode("ROOT");
-	tree->root->left = CreateNode("Left");
-	tree->root->left->left = CreateNode("Left_Left");
-	tree->root->left->right = CreateNode("Left_Right");
-	tree->root->left->right->right = CreateNode("Left_Right_Right");
-	tree->root->left->right->right->right = CreateNode("Left_Right_Right_Right");
-	tree->root->left->right->left = CreateNode("Left_Right_Left");
-	tree->root->right = CreateNode("Right");
-	tree->root->right->left = CreateNode("Right_Left");
-	tree->root->right->right = CreateNode("Right_Right");
-
-	PrintGraph(tree);
-	WriteGraph(tree);
-*/
 	Tree * one = CreateTree();
 
 	FILE * fileptr = fopen("tree.txt", "r");
 	one->root = ReadGraph(fileptr);
-	if(one->root == NULL)
-		printf("HERE'S NULL\n");
 
-	//Search(one->root);
+	Search(one->root);
+	WriteGraph(one);
 
 	fclose(fileptr);
-	//PrintGraph(one);
-	//WriteGraph(one);
-
-	if(one->root->str == NULL)
-		printf("One root NULL\n");
-
-	printf("root = %s\nroot.left = %s\n", one->root->str, one->root->left->left->str);
+	return 0;
 }
 
 Tree * CreateTree()
@@ -127,29 +104,46 @@ int WriteGraph(Tree * tree)
 		return INCORRECT_ARGUMENT;
 
 	FILE * fileptr = fopen("newtree.txt", "w");
+	int i = 0;
 	
-	CycleWrite(fileptr, tree->root);
+	CycleWrite(fileptr, tree->root, i);
 
 	fclose(fileptr);
 
 	return 0;
 }
 
-int CycleWrite(FILE * fileptr, Node * node)
+int CycleWrite(FILE * fileptr, Node * node, int i)
 {
-
+	i++;
+	printf("I ============ %d\n", i );
 	if(!fileptr || !node)
 		return INCORRECT_ARGUMENT;
 
 	fprintf(fileptr, "{ ");
-	fprintf(fileptr, "%s\n", node->str);
+	fprintf(fileptr, "%s ", node->str);
+
+	if(node->left != NULL && node->right != NULL)
+		fprintf(fileptr, "\n");
+
+	if(node->left != NULL && node->right == NULL)
+		fprintf(fileptr, "\n");	
+
+	if(node->left == NULL && node->right == NULL)
+		fprintf(fileptr, "{} {}\n");
+
+	if(node->left == NULL && node->right != NULL)
+		fprintf(fileptr, "{}\n");
 
 	if(node->left)
-		CycleWrite(fileptr, node->left);
+		CycleWrite(fileptr, node->left, i);
 
+	if(node->right == NULL && node->left != NULL)
+		fprintf(fileptr, "{}\n");
+	
 	if(node->right)
-		CycleWrite(fileptr, node->right);
-
+		CycleWrite(fileptr, node->right, i);
+	
 	fprintf(fileptr, "}\n");
 
 	return 0;
@@ -170,34 +164,27 @@ Node * RecRead(char ** text, char * word, char * buff)
 		buff[j] = 0;
 	}
 	int i = 0;
-	//printf("RECREAD\n");
 	if(sscanf(*text, "%s", word) < 0)
 	{
 		printf("Bad scanf\n");
 		return NULL;
 	}
-	//printf("WORD = %s\n", word);
 	*text += strlen(word) + 1;
 	if(strcmp(word ,"{"))
 		return NULL;
 
 	while(strcmp(buff, "{}") != 0 && strcmp(buff, "{") != 0)
 	{
-		//int i = 0;
 		if(sscanf(*text, "%s ", word + i) < 0)
 		{
 			printf("Bad scanf\n");
 			return NULL;
 		}
-		//i += strlen(word + i);
-		printf("i = %d\n", i);
 		*text += strlen(word + i) + 1;
 		i += strlen(word + i);
 		sscanf(*text, "%s", buff);
-		//printf("wordi = %s wordi + 1 = %s\n", word + i - 1, word + i + 1);
 		word[i] = ' ';
 		i++;
-		//printf("text = %s word = %s, buff = %s\n",*text, strdup(word), buff);
 	}
 	
 	Node * node = CreateNode(strdup(word));	
@@ -273,17 +260,60 @@ long long FSize(FILE * ptrfile)
 
 void Search(Node * node)
 {
-	printf("Is this %s?\nEnter your answer ( y / n )\n", node->str);
-	char ans = getchar();
-	if(ans == 'y')
-		node = node->left;
-	else if(node->right)
-		node = node->right;
-	else 
+	do
 	{
-		char name[512];
-		printf("Who is it?\n");
-
+		char buff[10];
+		while(strcmp(buff, "yes") != 0 && strcmp(buff, "no") != 0)
+		{
+			printf("Is this %s?\nEnter \"yes\" or \"no\"\n", node->str);
+			scanf("%s", buff);
+			getchar();
+		}
+		if(strcmp(buff, "yes") == 0)
+		{
+			printf("YES\n");
+			if(node->left)
+			{
+				node = node->left;
+				for(int i = 0; i < 10; i++)
+					buff[i] = 0;
+			}
+			else
+			{
+				printf("I have said it to you!\n");
+				return;
+			}
+		}
+		if(strcmp(buff, "no") == 0)
+		{
+			printf("NO\n");
+			if(node->right)
+			{
+				node = node->right;
+				for(int i = 0; i < 10; i++)
+					buff[i] = 0;
+			}
+			else
+			{
+				printf("There no such character\n");
+				NodeChange(node);
+				return;
+			}
+		}
 	}
+	while(node);
+}
+
+void NodeChange(Node * node)
+{
+	char pers[50] = " ";
+	char diff[60] = " ";
+	printf("Who is it?\n");
+	fgets(pers, 50, stdin);
+	node->right = CreateNode(node->str);
+	node->left = CreateNode(strdup(pers));
+	printf("What is a difference between %s and %s?\n", node->str, strdup(pers));
+	fgets(diff, 60, stdin);
+	node->str = strdup(diff);
 }
 
