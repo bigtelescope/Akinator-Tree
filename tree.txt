@@ -1,0 +1,20 @@
+{ Earth
+	{ Europe
+		{ Final Countdown shit fuck {} {}	
+		} 
+		{ South AMerica 
+			{ Argentina 
+				{ MESSI {} {}
+				} {}
+			} 
+			{ Brasil {} {}
+			}
+		}
+	}
+	{ Mars 
+		{ Jupiter {} {}
+		} 
+		{ phobos {} {}
+		}
+	}
+}
