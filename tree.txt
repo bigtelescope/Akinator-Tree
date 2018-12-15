@@ -1,20 +1,28 @@
-{ Earth
-	{ Europe
-		{ Final Countdown shit fuck {} {}	
-		} 
-		{ South AMerica 
-			{ Argentina 
-				{ MESSI {} {}
-				} {}
-			} 
-			{ Brasil {} {}
-			}
+{ Nature
+	{ Human
+		{ Student {} {}
+		}
+		{ Elephant {} {}
 		}
 	}
-	{ Mars 
-		{ Jupiter {} {}
-		} 
-		{ phobos {} {}
+	{ Earth
+		{ Europe
+			{ Final Countdown shit fuck {} {}	
+			} 
+			{ South AMerica 
+				{ Argentina 
+					{ MESSI {} {}
+					} {}
+				} 
+				{ Brasil {} {}
+				}
+			}
+		}
+		{ Mars 
+			{ Jupiter {} {}
+			} 
+			{ phobos {} {}
+			}
 		}
 	}
 }

@@ -1,20 +1,24 @@
 //--------------------------------------------------
 //
-//починить ввод в dot нескольких слов
+//написать документацию
+//
+//раставить проверки (втч на нулевой файл)
 //
 //-------------------------------------------------
 
-#include "tree.h"
+#include "Akinator.h"
 
 int main()
 {
 	Tree * one = CreateTree();
 
 	FILE * fileptr = fopen("tree.txt", "r");
+
 	one->root = ReadGraph(fileptr);
 
 	Search(one->root);
 	WriteGraph(one);
+	PrintGraph(one);
 
 	fclose(fileptr);
 	return 0;
@@ -64,20 +68,20 @@ int CyclePrint(FILE * fileptr, Node * node)
 	
 	if(node->left)
 	{
-		fprintf(fileptr, "%s", node->str);
+		fprintf(fileptr, "\"%s\"", node->str);
 		fprintf(fileptr, " -- ");
 		CyclePrint(fileptr, node->left);
 	}
 
 	if(node->right)
 	{
-		fprintf(fileptr, "%s", node->str);
+		fprintf(fileptr, "\"%s\"", node->str);
 		fprintf(fileptr, " -- ");
 		CyclePrint(fileptr, node->right);
 	}
 
 	if(!node->right && !node->left)
-		fprintf(fileptr, "%s;\n", node->str);
+		fprintf(fileptr, "\"%s\";\n", node->str);
 
 	return 0;
 }
@@ -103,7 +107,7 @@ int WriteGraph(Tree * tree)
 	if(!tree)
 		return INCORRECT_ARGUMENT;
 
-	FILE * fileptr = fopen("newtree.txt", "w");
+	FILE * fileptr = fopen("tree.txt", "r+");
 	int i = 0;
 	
 	CycleWrite(fileptr, tree->root, i);
@@ -116,7 +120,10 @@ int WriteGraph(Tree * tree)
 int CycleWrite(FILE * fileptr, Node * node, int i)
 {
 	i++;
-	printf("I ============ %d\n", i );
+	int a = i;
+	for(int j = 1; j < a; j++)
+		fprintf(fileptr, "\t");
+	
 	if(!fileptr || !node)
 		return INCORRECT_ARGUMENT;
 
@@ -139,11 +146,17 @@ int CycleWrite(FILE * fileptr, Node * node, int i)
 		CycleWrite(fileptr, node->left, i);
 
 	if(node->right == NULL && node->left != NULL)
+	{
+		for(int j = 1; j < a; j++)
+			fprintf(fileptr, "\t");
 		fprintf(fileptr, "{}\n");
+	}
 	
 	if(node->right)
 		CycleWrite(fileptr, node->right, i);
 	
+	for(int j = 1; j < a; j++)
+		fprintf(fileptr, "\t");
 	fprintf(fileptr, "}\n");
 
 	return 0;
@@ -208,7 +221,6 @@ Node * RecRead(char ** text, char * word, char * buff)
 	if(strcmp(word ,"}"))
 		return NULL;
 
-	//printf("end\n");
 	return node;
 }
 
@@ -271,7 +283,6 @@ void Search(Node * node)
 		}
 		if(strcmp(buff, "yes") == 0)
 		{
-			printf("YES\n");
 			if(node->left)
 			{
 				node = node->left;
@@ -286,7 +297,6 @@ void Search(Node * node)
 		}
 		if(strcmp(buff, "no") == 0)
 		{
-			printf("NO\n");
 			if(node->right)
 			{
 				node = node->right;
@@ -316,4 +326,5 @@ void NodeChange(Node * node)
 	fgets(diff, 60, stdin);
 	node->str = strdup(diff);
 }
+
 
