@@ -1,27 +1,54 @@
-{ Nature
-	{ Human
-		{ Student {} {}
-		}
-		{ Elephant {} {}
-		}
-	}
-	{ Earth
-		{ Europe
-			{ Final Countdown shit fuck {} {}	
-			} 
-			{ South AMerica 
-				{ Argentina 
-					{ MESSI {} {}
-					} {}
-				} 
-				{ Brasil {} {}
+{ Nature  
+	{ Human  
+		{ Very smart  
+			{ Prepod  {} {}
+			}
+			{ Eat another people  
+				{ Bear  {} {}
+				}
+				{ Student  {} {}
 				}
 			}
 		}
-		{ Mars 
-			{ Jupiter {} {}
-			} 
-			{ phobos {} {}
+		{ Elephant  {} {}
+		}
+	}
+	{ Earth  
+		{ Europe  
+			{ Über alles in der Welt  
+				{ Deutschland, Deutschland über alles  {} {}
+				}
+				{ Is a capital of Great Britain
+ 
+					{ London {} {}
+					}
+					{ Final Countdown shit fuck  {} {}
+					}
+				}
+			}
+			{ South AMerica  
+				{ MAKES THE BEST FLOUR IN THE WORLD
+					{ Colombia  {} {}
+					}
+					{ Argentina  {} {}
+					}
+				}
+				{ Dirty city  
+					{ Chelyabinsk  {} {}
+					}
+					{ Brasil  {} {}
+					}
+				}
+			}
+		}
+		{ Mars  
+			{ phobos  {} {}
+			}
+			{ Very far  
+				{ Pluto  {} {}
+				}
+				{ Jupiter  {} {}
+				}
 			}
 		}
 	}

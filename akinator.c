@@ -1,11 +1,3 @@
-//--------------------------------------------------
-//
-//написать документацию
-//
-//раставить проверки (втч на нулевой файл)
-//
-//-------------------------------------------------
-
 #include "Akinator.h"
 
 int main()
@@ -13,6 +5,11 @@ int main()
 	Tree * one = CreateTree();
 
 	FILE * fileptr = fopen("tree.txt", "r");
+	if(!fileptr)
+	{
+		printf("File reading error\n");
+		return FILE_READING_ERROR;
+	}
 
 	one->root = ReadGraph(fileptr);
 
@@ -31,20 +28,18 @@ Tree * CreateTree()
 		return NULL;
 
 	point->root = NULL;
-	point->amount = 0;
 	return point;
 }
 
 void TreeDestroy(Tree * point)
 {
-	point->amount = 0;
 	free(point->root);
 	free(point);
 }
 
 Node * CreateNode(char * value)
 {
-	if(value == NULL || value == "\0")
+	if(value == NULL || *value == '\0')
 	{
 		printf("CreateNode fucked up\n");
 		return NULL;
@@ -64,7 +59,7 @@ Node * CreateNode(char * value)
 int CyclePrint(FILE * fileptr, Node * node)
 {
 	if(!fileptr || !node)
-		return -1;
+		return INCORRECT_ARGUMENT;
 	
 	if(node->left)
 	{
@@ -91,6 +86,8 @@ int PrintGraph(Tree * point)
 	if(!point)
 		return INCORRECT_ARGUMENT;
 	FILE * fileptr = fopen("graph.txt", "w");
+	if(!fileptr)
+		return FILE_READING_ERROR;
 
 	fprintf(fileptr, "graph one{\n");
 	CyclePrint(fileptr, point->root);
@@ -108,8 +105,10 @@ int WriteGraph(Tree * tree)
 		return INCORRECT_ARGUMENT;
 
 	FILE * fileptr = fopen("tree.txt", "r+");
-	int i = 0;
+	if(!fileptr)
+		return FILE_READING_ERROR;
 	
+	int i = 0;
 	CycleWrite(fileptr, tree->root, i);
 
 	fclose(fileptr);
@@ -119,13 +118,13 @@ int WriteGraph(Tree * tree)
 
 int CycleWrite(FILE * fileptr, Node * node, int i)
 {
+	if(!fileptr || !node)
+		return INCORRECT_ARGUMENT;
+
 	i++;
 	int a = i;
 	for(int j = 1; j < a; j++)
 		fprintf(fileptr, "\t");
-	
-	if(!fileptr || !node)
-		return INCORRECT_ARGUMENT;
 
 	fprintf(fileptr, "{ ");
 	fprintf(fileptr, "%s ", node->str);
@@ -171,6 +170,9 @@ int SkipSpace(char ** text)
 
 Node * RecRead(char ** text, char * word, char * buff)
 {
+	if(!text || !word || !buff)
+		return NULL;
+
 	for(int j = 0; j < 30; j++)
 	{
 		word[j] = 0;
@@ -235,11 +237,18 @@ Node * ReadGraph(FILE * fileptr)
 
 	printf("size = %lld\n", size);
 	char * text = (char *)calloc(size, sizeof(char));
-	char * word = (char *)calloc(size, sizeof(char));
-	char * buff = (char *)calloc(size, sizeof(char));
-	int counter = 0;
+	if(!text)
+		return NULL;
 
-	if((fread(text, sizeof(char), size, fileptr)) != size)
+	char * word = (char *)calloc(size, sizeof(char));
+	if(!word)
+		return NULL;
+
+	char * buff = (char *)calloc(size, sizeof(char));
+	if(!buff)
+		return NULL;
+
+	if((fread(text, sizeof(char), size, fileptr)) != (unsigned int)size)
 	{
 		printf("fread wasn't completed");
 		return NULL;
@@ -259,19 +268,33 @@ Node * ReadGraph(FILE * fileptr)
 long long FSize(FILE * ptrfile)
 {
 	if(ptrfile == NULL)
-	{
-		perror("Error of file reading");
-		return -1;
-	}
+		return INCORRECT_ARGUMENT;
+
 	long long curroff = ftell(ptrfile);
-	fseek(ptrfile, 0, SEEK_END);
+	if(curroff < 0)
+		return SIZE_DEF_ERROR;
+
+	if(fseek(ptrfile, 0, SEEK_END))
+		return SIZE_DEF_ERROR;
+
 	long long size = ftell(ptrfile);
-	fseek(ptrfile, curroff, SEEK_SET);
+	if(size < 0)
+		return SIZE_DEF_ERROR;
+
+	if(fseek(ptrfile, curroff, SEEK_SET))
+		return SIZE_DEF_ERROR;
+
+	if(size < 0)
+		return EMPTY_FILE;
+
 	return size;
 }
 
 void Search(Node * node)
 {
+	if(!node)
+		return;
+
 	do
 	{
 		char buff[10];
@@ -316,6 +339,9 @@ void Search(Node * node)
 
 void NodeChange(Node * node)
 {
+	if(!node)
+		return;
+
 	char pers[50] = " ";
 	char diff[60] = " ";
 	printf("Who is it?\n");
